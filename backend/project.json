@@ -1,0 +1,12 @@
+{
+  "name": "backend",
+  "targets": {
+    "serve": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "source venv/bin/activate && uvicorn main:app --reload",
+        "cwd": "backend"
+      }
+    }
+  }
+}

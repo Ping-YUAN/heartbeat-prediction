@@ -4,7 +4,10 @@
   "license": "MIT",
   "scripts": {
     "server": "nx serve backend",
-    "client": "nx serve frontend"
+    "client": "nx serve frontend",
+    "build": "nx build frontend",
+    "test": "nx test frontend",
+    "docker:up": "docker compose up --build"
   },
   "private": true,
   "devDependencies": {

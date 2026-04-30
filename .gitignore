@@ -4,9 +4,14 @@
 dist
 tmp
 out-tsc
+__pycache__
+*.pyc
+backend/models
 
 # dependencies
 node_modules
+venv
+backend/venv
 
 # IDEs and editors
 /.idea

@@ -1,114 +1,88 @@
-# HeartbeatPrediction
+# Heartbeat Prediction
 
-This is a demo app for docter(target) review the ecg signal of a patience. Doctor can vitualize the esg signal and also get predict with the CNN model that we trained [here](https://github.com/Ping-YUAN/heartbeat-analysis-ai).
+> **Experimental project only. Not medical advice.**
+>
+> This application is a research and learning prototype. It is not a medical device, has not been clinically validated, and must not be used to diagnose, treat, monitor, or make decisions about any real patient. Any prediction, confidence score, ECG visualization, or dashboard metric shown by this app is for experimentation only.
 
+Doctor-facing ECG review app backed by a FastAPI inference service and a React dashboard.
 
+## What it does
 
+- Lists ECG patient samples from CSV fixtures committed in this repo.
+- Ships local sample CSV files under `backend/sample_data` for the demo dashboard.
+- Shows the selected ECG waveform with detected R peaks.
+- Overlays the mean normal heartbeat template when normal samples are available.
+- Computes basic dashboard metrics: estimated pulse, beat count, RR interval, duration, and amplitude range.
+- Calls the Python API for first-pass binary classification: normal vs abnormal plus confidence.
 
-<a alt="Nx logo" href="https://nx.dev" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-logo.png" width="45"></a>
+## Local Development
 
-✨ Your new, shiny [Nx workspace](https://nx.dev) is ready ✨.
+Run these commands from the `heartbeat-prediction` repo.
 
-[Learn more about this workspace setup and its capabilities](https://nx.dev/nx-api/js?utm_source=nx_project&amp;utm_medium=readme&amp;utm_campaign=nx_projects) or run `npx nx graph` to visually explore what was created. Now, let's get you up to speed!
-
-## Generate a library
-
-```sh
-npx nx g @nx/js:lib packages/pkg1 --publishable --importPath=@my-org/pkg1
-```
-
-## Run tasks
-
-To build the library use:
-
-```sh
-npx nx build pkg1
-```
-
-To run any task with Nx use:
+Backend, in one terminal:
 
 ```sh
-npx nx <target> <project-name>
+cd backend
+python -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+uvicorn main:app --reload --port 8000
 ```
 
-These targets are either [inferred automatically](https://nx.dev/concepts/inferred-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) or defined in the `project.json` or `package.json` files.
-
-[More about running tasks in the docs &raquo;](https://nx.dev/features/run-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-## Versioning and releasing
-
-To version and release the library use
-
-```
-npx nx release
-```
-
-Pass `--dry-run` to see what would happen without actually releasing the library.
-
-[Learn more about Nx release &raquo;](hhttps://nx.dev/features/manage-releases?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-## Keep TypeScript project references up to date
-
-Nx automatically updates TypeScript [project references](https://www.typescriptlang.org/docs/handbook/project-references.html) in `tsconfig.json` files to ensure they remain accurate based on your project dependencies (`import` or `require` statements). This sync is automatically done when running tasks such as `build` or `typecheck`, which require updated references to function correctly.
-
-To manually trigger the process to sync the project graph dependencies information to the TypeScript project references, run the following command:
+The default backend install does not include TensorFlow, so the API can still run if your platform cannot install a compatible TensorFlow wheel. In that mode, `/api/analyze` uses the development fallback classifier. To enable the Keras model downloaded from the training repo, install:
 
 ```sh
-npx nx sync
+pip install -r requirements-ml.txt
 ```
 
-You can enforce that the TypeScript project references are always in the correct state when running in CI by adding a step to your CI job configuration that runs the following command:
+Frontend, in a second terminal from the repo root:
 
 ```sh
-npx nx sync:check
+npm install
+npx nx serve frontend
 ```
 
-[Learn more about nx sync](https://nx.dev/reference/nx-commands#sync)
+Open:
 
-## Set up CI!
+- App: `http://localhost:4200`
+- API docs: `http://localhost:8000/docs`
 
-### Step 1
+The frontend calls `http://localhost:8000` by default. Set `VITE_API_BASE_URL` to use another API host.
 
-To connect to Nx Cloud, run the following command:
+## Docker
+
+The Docker image builds the React app, serves it from FastAPI at `/app`, and exposes the API under `/api`.
 
 ```sh
-npx nx connect
+docker compose up --build
 ```
 
-Connecting to Nx Cloud ensures a [fast and scalable CI](https://nx.dev/ci/intro/why-nx-cloud?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) pipeline. It includes features such as:
+Open:
 
-- [Remote caching](https://nx.dev/ci/features/remote-cache?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Task distribution across multiple machines](https://nx.dev/ci/features/distribute-task-execution?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Automated e2e test splitting](https://nx.dev/ci/features/split-e2e-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Task flakiness detection and rerunning](https://nx.dev/ci/features/flaky-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+- App: `http://localhost:8000/app`
+- API docs: `http://localhost:8000/docs`
+- Health: `http://localhost:8000/api/health`
 
-### Step 2
+## Data and Model Sources
 
-Use the following command to configure a CI workflow for your workspace:
+`heartbeat-prediction` is independent from the training repo. It does not read any local sibling `heartbeat-analysis-ai` directory.
 
-```sh
-npx nx g ci-workflow
-```
+Training code, source notebooks, and model artifact history live in:
 
-[Learn more about Nx on CI](https://nx.dev/ci/intro/ci-with-nx#ready-get-started-with-your-provider?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+- `https://github.com/Ping-YUAN/heartbeat-analysis-ai`
 
-## Install Nx Console
+The demo patient sample CSV files are generated into this repo at:
 
-Nx Console is an editor extension that enriches your developer experience. It lets you run tasks, generate code, and improves code autocompletion in your IDE. It is available for VSCode and IntelliJ.
+- `backend/sample_data/mit_test.csv`
+- `backend/sample_data/mit_train.csv`
+- `backend/sample_data/ptb_normal.csv`
+- `backend/sample_data/ptb_abnormal.csv`
 
-[Install Nx Console &raquo;](https://nx.dev/getting-started/editor-setup?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+By default, the API downloads the trained model and scaler from the GitHub raw URLs for the training repo:
 
-## Useful links
+- `https://raw.githubusercontent.com/Ping-YUAN/heartbeat-analysis-ai/main/src/streamlit/utils/model_mit_binary_shift_cnn.h5`
+- `https://raw.githubusercontent.com/Ping-YUAN/heartbeat-analysis-ai/main/src/streamlit/utils/mit_shift_scaler.pkl`
 
-Learn more:
+If TensorFlow or the model is unavailable, the API still returns a heuristic fallback result so the UI remains usable during development.
 
-- [Learn more about this workspace setup](https://nx.dev/nx-api/js?utm_source=nx_project&amp;utm_medium=readme&amp;utm_campaign=nx_projects)
-- [Learn about Nx on CI](https://nx.dev/ci/intro/ci-with-nx?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Releasing Packages with Nx release](https://nx.dev/features/manage-releases?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [What are Nx plugins?](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-And join the Nx community:
-- [Discord](https://go.nx.dev/community)
-- [Follow us on X](https://twitter.com/nxdevtools) or [LinkedIn](https://www.linkedin.com/company/nrwl)
-- [Our Youtube channel](https://www.youtube.com/@nxdevtools)
-- [Our blog](https://nx.dev/blog?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+If sample CSV files are unavailable in the container, the API generates a small synthetic ECG sample set so the dashboard can still be exercised end to end.

@@ -1,0 +1,4 @@
+# Optional dependency for loading the trained Keras `.h5` model locally.
+# Install this after `requirements.txt` only when your Python version/platform
+# has a compatible TensorFlow wheel.
+tensorflow==2.19.0

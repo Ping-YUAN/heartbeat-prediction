@@ -1,54 +1,54 @@
-import styled from 'styled-components';
-import NxWelcome from './nx-welcome';
-
-import { Route, Routes, Link } from 'react-router-dom';
-
-const StyledApp = styled.div`
-  // Your style here
-`;
+import { AnalysisPanel } from './components/analysis-panel';
+import { AppHeader } from './components/app-header';
+import { EcgPanel } from './components/ecg-panel';
+import { MetricDashboard } from './components/metric-dashboard';
+import { PatientSidebar } from './components/patient-sidebar';
+import { Content, ErrorText, Layout, Page, Sidebar } from './components/ui';
+import { useHeartbeatWorkbench } from './hooks/use-heartbeat-workbench';
 
 export function App() {
-  return (
-    <StyledApp>
-      <NxWelcome title="@heartbeat-prediction/frontend" />
+  const workbench = useHeartbeatWorkbench();
 
-      {/* START: routes */}
-      {/* These routes and navigation have been generated for you */}
-      {/* Feel free to move and update them to fit your needs */}
-      <br />
-      <hr />
-      <br />
-      <div role="navigation">
-        <ul>
-          <li>
-            <Link to="/">Home</Link>
-          </li>
-          <li>
-            <Link to="/page-2">Page 2</Link>
-          </li>
-        </ul>
-      </div>
-      <Routes>
-        <Route
-          path="/"
-          element={
-            <div>
-              This is the generated root route.{' '}
-              <Link to="/page-2">Click here for page 2.</Link>
-            </div>
-          }
-        />
-        <Route
-          path="/page-2"
-          element={
-            <div>
-              <Link to="/">Click here to go back to root page.</Link>
-            </div>
-          }
-        />
-      </Routes>
-      {/* END: routes */}
-    </StyledApp>
+  return (
+    <Page>
+      <AppHeader modelStatus={workbench.modelStatus} />
+
+      <Layout>
+        <Sidebar>
+          <PatientSidebar
+            patients={workbench.filteredPatients}
+            query={workbench.query}
+            selectedId={workbench.selectedId}
+            onQueryChange={workbench.setQuery}
+            onSelectPatient={workbench.setSelectedId}
+          />
+        </Sidebar>
+
+        <Content>
+          {workbench.error ? <ErrorText>{workbench.error}</ErrorText> : null}
+
+          <MetricDashboard metrics={workbench.metrics} />
+
+          <EcgPanel
+            detail={workbench.detail}
+            loading={workbench.loading}
+            metrics={workbench.metrics}
+            referenceSignals={workbench.referenceSignals}
+            selectedReference={workbench.selectedReference}
+            selectedReferenceId={workbench.selectedReferenceId}
+            onSelectReference={workbench.setSelectedReferenceId}
+          />
+
+          <AnalysisPanel
+            analysis={workbench.analysis}
+            analyzing={workbench.analyzing}
+            hasPatient={Boolean(workbench.detail)}
+            metrics={workbench.metrics}
+            onRunAnalysis={workbench.runAnalysis}
+          />
+        </Content>
+      </Layout>
+    </Page>
   );
 }
 

@@ -1,0 +1,16 @@
+services:
+  heartbeat-prediction:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      MODEL_URL: ${MODEL_URL:-https://raw.githubusercontent.com/Ping-YUAN/heartbeat-analysis-ai/main/src/streamlit/utils/model_mit_binary_shift_cnn.h5}
+      SCALER_URL: ${SCALER_URL:-https://raw.githubusercontent.com/Ping-YUAN/heartbeat-analysis-ai/main/src/streamlit/utils/mit_shift_scaler.pkl}
+      CORS_ORIGINS: ${CORS_ORIGINS:-*}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3

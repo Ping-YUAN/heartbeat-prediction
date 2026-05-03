@@ -65,7 +65,7 @@ Open:
 
 ## Data and Model Sources
 
-`heartbeat-prediction` is independent from the training repo. It does not read any local sibling `heartbeat-analysis-ai` directory.
+`heartbeat-prediction` is independent from the training repo.
 
 Training code, source notebooks, and model artifact history live in:
 

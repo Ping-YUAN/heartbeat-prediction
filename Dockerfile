@@ -3,10 +3,12 @@ FROM node:22-bookworm-slim AS frontend-build
 WORKDIR /workspace/heartbeat-prediction
 COPY package*.json ./
 COPY frontend/package.json ./frontend/package.json
-RUN npm ci
+RUN npm install @rollup/rollup-linux-x64-gnu
+RUN npm ci 
+##--omit=optional
 
 COPY . ./
-RUN npx nx build frontend
+RUN npx vite build --config frontend/vite.config.ts
 
 FROM python:3.11-slim AS runtime
 
